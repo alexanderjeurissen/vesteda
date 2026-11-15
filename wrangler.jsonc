@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vesteda-watch",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-15",
+  // Checks run every 2 min on a Durable Object alarm (see Watcher.alarm). The cron is only a
+  // watchdog that starts the alarm loop after deploy and restarts it if it's ever lost.
+  // Secrets: VESTEDA_EMAIL, VESTEDA_PASSWORD, NTFY_TOPIC (optional).
+  "triggers": { "crons": ["*/10 * * * *"] },
+  // Non-empty = stop polling Vesteda (alarm stops rescheduling); remove to resume.
+  "vars": { "PAUSED": "Vesteda bot protection blocks Cloudflare egress IPs (403 on /login)" },
+  "durable_objects": {
+    "bindings": [{ "name": "WATCHER", "class_name": "Watcher" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Watcher"] }],
+  "observability": { "enabled": true, "traces": { "enabled": true } }
+}
